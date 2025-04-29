@@ -860,8 +860,8 @@
         <li><a href="dashboard.jsp" class="nav-link active">Home</a></li>
         <li><a href="order-motor.jsp" class="nav-link">Order Motor</a></li>
         <li><a href="my-orders.jsp" class="nav-link">My Orders</a></li>
-        <li><a href="about.jsp" class="nav-link">About Us</a></li>
-        <li><a href="contact.jsp" class="nav-link">Contact Us</a></li>
+        <li><a href="About_Us.jsp" class="nav-link">About Us</a></li>
+        <li><a href="Contact_Us.jsp" class="nav-link">Contact Us</a></li>
       </ul>
       <div class="user-actions">
         <button class="login-btn">Login</button>
