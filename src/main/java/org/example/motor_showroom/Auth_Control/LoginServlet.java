@@ -1,6 +1,5 @@
 package org.example.motor_showroom.Auth_Control;
 
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -23,14 +22,12 @@ public class LoginServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.sendRedirect(request.getContextPath() + "/auth/login.jsp");
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
@@ -39,12 +36,14 @@ public class LoginServlet extends HttpServlet {
         if (user != null) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
+            session.setMaxInactiveInterval(30 * 60); // 30 minutes
 
-            String redirectPath = "Customer".equals(user.getRole())
-                    ? request.getContextPath() + "/Customer dashboard/customer.jsp"
-                    : request.getContextPath() + "/Admin dashboard/admin.jsp";
-
-            response.sendRedirect(redirectPath);
+            // Redirect based on role
+            if ("Admin".equals(user.getRole())) {
+                response.sendRedirect(request.getContextPath() + "/Admin dashboard/admin.jsp");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/Customer dashboard/customer.jsp");
+            }
         } else {
             request.setAttribute("error", "Invalid username or password");
             request.getRequestDispatcher("/auth/login.jsp").forward(request, response);

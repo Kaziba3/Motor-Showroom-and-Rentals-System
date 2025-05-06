@@ -21,20 +21,18 @@ public class RegisterServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
         String address = request.getParameter("address");
-        String role = request.getParameter("role"); // Get selected role
+        String role = request.getParameter("role");
 
         // Validate inputs
         if (!password.equals(confirmPassword)) {
@@ -62,7 +60,7 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        // Create new user with selected role
+        // Create new user
         User newUser = new User(username, email, password, address, role);
 
         if (userDao.registerUser(newUser)) {
