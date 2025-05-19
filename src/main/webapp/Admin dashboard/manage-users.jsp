@@ -1,11 +1,10 @@
-<%@page import="org.example.motor_showroom.Models.User"%>
 <%@page import="java.util.List"%>
-<%@page import="org.example.motor_showroom.Models.Order"%>
+<%@page import="org.example.motor_showroom.Models.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Dashboard</title>
+    <title>Manage Users</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         :root {
@@ -14,6 +13,7 @@
             --primary-bg: #f1f3f5;
             --card-bg: #ffffff;
             --accent: #007bff;
+            --danger: #dc3545;
         }
 
         * {
@@ -23,7 +23,6 @@
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
             background-color: var(--primary-bg);
             color: #333;
         }
@@ -71,6 +70,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 30px;
         }
 
         .header h1 {
@@ -79,7 +79,7 @@
         }
 
         .logout-btn {
-            background-color: #dc3545;
+            background-color: var(--danger);
             color: #fff;
             border: none;
             padding: 10px 18px;
@@ -88,40 +88,23 @@
         }
 
         .logout-btn:hover {
-            background-color: #c82333;
+            opacity: 0.9;
         }
 
-        .stats {
-            display: flex;
-            gap: 20px;
-            margin: 30px 0;
-            flex-wrap: wrap;
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
         }
 
-        .stat-card {
-            flex: 1 1 200px;
-            background-color: var(--card-bg);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-            text-align: center;
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
         }
 
-        .stat-title {
-            color: #777;
-            font-size: 1rem;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-
-        .section-title {
-            margin-top: 40px;
-            margin-bottom: 10px;
-            font-size: 1.4rem;
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
         }
 
         table {
@@ -130,6 +113,7 @@
             background: var(--card-bg);
             border-radius: 8px;
             overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         }
 
         th, td {
@@ -140,29 +124,40 @@
 
         th {
             background-color: #f8f9fa;
+            font-weight: 600;
         }
 
         tr:hover {
             background-color: #f1f1f1;
         }
 
-        .status {
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 0.85rem;
-            color: #fff;
+        .btn {
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
         }
 
-        .pending {
-            background-color: #ffc107;
+        .btn:hover {
+            opacity: 0.9;
         }
 
-        .completed {
-            background-color: #28a745;
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
         }
 
-        .cancelled {
-            background-color: #dc3545;
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
         }
 
         @media (max-width: 768px) {
@@ -175,10 +170,6 @@
             .main {
                 margin-left: 0;
                 width: 100%;
-            }
-
-            .stats {
-                flex-direction: column;
             }
         }
     </style>
@@ -195,60 +186,70 @@
 <div class="sidebar">
     <div class="logo">Admin Panel</div>
     <nav>
-        <a href="${pageContext.request.contextPath}/admin/dashboard" class="active">Dashboard</a>
+        <a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a>
         <a href="${pageContext.request.contextPath}/admin/motors">Manage Motors</a>
         <a href="${pageContext.request.contextPath}/admin/orders">Manage Orders</a>
-        <a href="${pageContext.request.contextPath}/admin/users">Manage Users</a>
+        <a href="${pageContext.request.contextPath}/admin/users" class="active">Manage Users</a>
     </nav>
 </div>
 
 <div class="main">
     <div class="header">
-        <h1>Welcome, Admin</h1>
+        <h1>Manage Users</h1>
         <button class="logout-btn" onclick="window.location.href='${pageContext.request.contextPath}/logout'">LOGOUT</button>
     </div>
 
-    <div class="stats">
-        <div class="stat-card">
-            <div class="stat-title">Total Motors</div>
-            <div class="stat-value"><%= request.getAttribute("totalMotors") %></div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-title">Total Orders</div>
-            <div class="stat-value"><%= request.getAttribute("totalOrders") %></div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-title">Total Users</div>
-            <div class="stat-value"><%= request.getAttribute("totalUsers") %></div>
-        </div>
+    <% if (request.getParameter("success") != null) { %>
+    <div class="alert alert-success">
+        <%= request.getParameter("success") %>
     </div>
+    <% } %>
 
-    <h2 class="section-title">Recent Orders</h2>
+    <% if (request.getParameter("error") != null) { %>
+    <div class="alert alert-error">
+        <%= request.getParameter("error") %>
+    </div>
+    <% } %>
+
     <table>
         <thead>
         <tr>
-            <th>Order ID</th>
-            <th>Motor</th>
-            <th>Type</th>
-            <th>Total</th>
-            <th>Status</th>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Actions</th>
         </tr>
         </thead>
         <tbody>
         <%
-            List<Order> orders = (List<Order>) request.getAttribute("recentOrders");
-            if (orders != null && !orders.isEmpty()) {
-                for (Order order : orders) {
+            List<User> users = (List<User>) request.getAttribute("users");
+            if (users != null && !users.isEmpty()) {
+                for (User u : users) {
         %>
         <tr>
-            <td><%= order.getOrderId() %></td>
-            <td><%= order.getMotorName() %></td>
-            <td><%= order.getOrderType() %></td>
-            <td>$<%= String.format("%.2f", order.getTotalAmount()) %></td>
+            <td><%= u.getUserId() %></td>
+            <td><%= u.getUsername() %></td>
+            <td><%= u.getEmail() %></td>
             <td>
-                <span class="status <%= order.getStatus().toLowerCase() %>">
-                    <%= order.getStatus() %>
-                </span>
+                <form method="POST" action="${pageContext.request.contextPath}/admin/users" style="display: inline;">
+                    <input type="hidden" name="action" value="updateRole">
+                    <input type="hidden" name="userId" value="<%= u.getUserId() %>">
+                    <select name="role" onchange="this.form.submit()">
+                        <option value="Admin" <%= "Admin".equals(u.getRole()) ? "selected" : "" %>>Admin</option>
+                        <option value="Customer" <%= "Customer".equals(u.getRole()) ? "selected" : "" %>>Customer</option>
+                    </select>
+                </form>
+            </td>
+            <td>
+                <form method="POST" action="${pageContext.request.contextPath}/admin/users" style="display: inline;">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="userId" value="<%= u.getUserId() %>">
+                    <button type="submit" class="btn btn-danger"
+                            onclick="return confirm('Are you sure you want to delete this user?')">
+                        Delete
+                    </button>
+                </form>
             </td>
         </tr>
         <%
@@ -256,7 +257,7 @@
         } else {
         %>
         <tr>
-            <td colspan="5" style="text-align: center; color: #777;">No recent orders available</td>
+            <td colspan="5" style="text-align: center;">No users found</td>
         </tr>
         <% } %>
         </tbody>

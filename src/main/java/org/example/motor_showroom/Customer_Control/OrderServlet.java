@@ -15,8 +15,9 @@ import org.example.motor_showroom.Models.User;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 
-@WebServlet("/customer/order")
+@WebServlet("/customer/orders")
 public class OrderServlet extends HttpServlet {
     private MotorDAO motorDao;
     private OrderDAO orderDao;
@@ -28,50 +29,109 @@ public class OrderServlet extends HttpServlet {
         orderDao = new OrderDAO();
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int motorId = Integer.parseInt(request.getParameter("motorId"));
-        Motor motor = motorDao.getMotorById(motorId);
-
-        if (motor == null || !motor.isAvailability()) {
-            response.sendRedirect(request.getContextPath() + "/customer/dashboard?error=Motor+not+available");
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/auth/login.jsp");
             return;
         }
 
-        request.setAttribute("motor", motor);
-        request.getRequestDispatcher("/Customer dashboard/order-motor.jsp").forward(request, response);
+        User user = (User) session.getAttribute("user");
+        System.out.println("Fetching orders for user ID: " + user.getUserId());
+
+        try {
+            List<Order> orders = orderDao.getOrdersByUserId(user.getUserId());
+            System.out.println("Found " + (orders != null ? orders.size() : 0) + " orders");
+
+            if (orders == null) {
+                request.setAttribute("error", "Failed to load orders. Please try again.");
+            } else {
+                request.setAttribute("orders", orders);
+            }
+
+            request.getRequestDispatcher("/Customer dashboard/my-orders.jsp").forward(request, response);
+        } catch (Exception e) {
+            System.err.println("Error loading orders for user " + user.getUserId());
+            e.printStackTrace();
+            request.setAttribute("error", "Error loading orders: " + e.getMessage());
+            request.getRequestDispatcher("/Customer dashboard/my-orders.jsp").forward(request, response);
+        }
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-        User user = (User) session.getAttribute("user");
-
-        Order order = new Order();
-        order.setUserId(user.getUserId());
-        order.setMotorId(Integer.parseInt(request.getParameter("motorId")));
-        order.setOrderType(request.getParameter("orderType"));
-
-        if ("Rent".equals(order.getOrderType())) {
-            order.setRentDuration(Integer.parseInt(request.getParameter("rentDuration")));
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/auth/login.jsp");
+            return;
         }
 
-        Motor motor = motorDao.getMotorById(order.getMotorId());
-        double total = calculateTotal(motor, order.getRentDuration());
+        User user = (User) session.getAttribute("user");
+        String motorIdParam = request.getParameter("motorId");
+        String orderType = request.getParameter("orderType");
 
-        order.setTotalAmount(total);
-        order.setDeliveryAddress(request.getParameter("deliveryAddress"));
-        order.setPaymentMethod(request.getParameter("paymentMethod"));
-        order.setStatus("Pending");
-        order.setOrderDate(Timestamp.from(Instant.now()));
+        if (motorIdParam == null || orderType == null) {
+            response.sendRedirect(request.getContextPath() + "/customer/dashboard?error=Invalid+request");
+            return;
+        }
 
-        if (orderDao.createOrder(order)) {
-            response.sendRedirect("orders?success=Order+placed+successfully");
-        } else {
-            response.sendRedirect("order-motor.jsp?motorId=" + order.getMotorId() + "&error=Failed+to+place+order");
+        try {
+            Order order = new Order();
+            order.setUserId(user.getUserId());
+            order.setMotorId(Integer.parseInt(motorIdParam));
+            order.setOrderType(orderType);
+
+            // Validate rent duration for rental orders
+            if ("Rent".equals(orderType)) {
+                String rentDurationParam = request.getParameter("rentDuration");
+                if (rentDurationParam == null || rentDurationParam.isEmpty()) {
+                    response.sendRedirect(request.getContextPath() + "/customer/order?motorId=" + motorIdParam + "&error=Please+enter+rental+duration");
+                    return;
+                }
+                int rentDuration = Integer.parseInt(rentDurationParam);
+                if (rentDuration < 1) {
+                    response.sendRedirect(request.getContextPath() + "/customer/order?motorId=" + motorIdParam + "&error=Rental+duration+must+be+at+least+1+day");
+                    return;
+                }
+                order.setRentDuration(rentDuration);
+            }
+
+            Motor motor = motorDao.getMotorById(order.getMotorId());
+            if (motor == null || !motor.isAvailability()) {
+                response.sendRedirect(request.getContextPath() + "/customer/dashboard?error=Motor+not+available");
+                return;
+            }
+
+            // Set motor name in the order
+            order.setMotorName(motor.getName());
+
+            // Calculate total
+            double total = calculateTotal(motor, order.getRentDuration());
+            order.setTotalAmount(total);
+            order.setDeliveryAddress(request.getParameter("deliveryAddress"));
+            order.setPaymentMethod(request.getParameter("paymentMethod"));
+            order.setStatus("Pending");
+            order.setOrderDate(Timestamp.from(Instant.now()));
+
+            if (orderDao.createOrder(order)) {
+                System.out.println("Order created successfully, redirecting to confirmation page");
+                response.sendRedirect(request.getContextPath() + "/customer/order/confirmation?orderId=" + order.getOrderId());
+            } else {
+                response.sendRedirect(request.getContextPath() + "/customer/order?motorId=" + motorIdParam + "&error=Failed+to+place+order");
+            }
+        } catch (NumberFormatException e) {
+            response.sendRedirect(request.getContextPath() + "/customer/order?motorId=" + motorIdParam + "&error=Invalid+input");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/customer/dashboard?error=Unexpected+error");
         }
     }
 
     private double calculateTotal(Motor motor, Integer rentDuration) {
-        if (rentDuration == null) return motor.getPrice() + 49.99; // Shipping fee
+        if (rentDuration == null) {
+            return motor.getPrice() + 49.99; // Base price + shipping
+        }
         return (motor.getPrice() * 0.1 * rentDuration) + 49.99; // 10% of price per day + shipping
     }
 }

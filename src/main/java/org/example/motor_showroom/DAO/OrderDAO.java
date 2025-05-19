@@ -37,20 +37,36 @@ public class OrderDAO {
     // Get orders by user ID
     public List<Order> getOrdersByUserId(int userId) {
         List<Order> orders = new ArrayList<>();
-        String sql = "SELECT o.*, m.name as motor_name FROM orders o "
-                + "JOIN motors m ON o.motorid = m.motorid "
-                + "WHERE o.userid = ? ORDER BY o.order_date DESC";
+        String sql = "SELECT o.*, m.name as motor_name FROM orders o " +
+                "JOIN motors m ON o.motorid = m.motorid " +
+                "WHERE o.userid = ? ORDER BY o.order_date DESC";
 
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, userId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    orders.add(mapOrderFromResultSet(rs));
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Order order = new Order();
+                order.setOrderId(rs.getInt("orderid"));
+                order.setUserId(rs.getInt("userid"));
+                order.setMotorId(rs.getInt("motorid"));
+                order.setOrderType(rs.getString("order_type"));
+                order.setRentDuration(rs.getInt("rent_duration"));
+                if (rs.wasNull()) {
+                    order.setRentDuration(null);
                 }
+                order.setTotalAmount(rs.getDouble("total_amount"));
+                order.setDeliveryAddress(rs.getString("delivery_address"));
+                order.setPaymentMethod(rs.getString("payment_method"));
+                order.setStatus(rs.getString("status"));
+                order.setOrderDate(rs.getTimestamp("order_date"));
+                order.setMotorName(rs.getString("motor_name"));
+                orders.add(order);
             }
         } catch (SQLException e) {
+            System.err.println("Error fetching orders for user " + userId);
             e.printStackTrace();
         }
         return orders;
@@ -59,8 +75,11 @@ public class OrderDAO {
     // Get all orders (admin view)
     public List<Order> getAllOrders() {
         List<Order> orders = new ArrayList<>();
-        String sql = "SELECT o.*, m.name as motor_name FROM orders o "
-                + "JOIN motors m ON o.motorid = m.motorid";
+        String sql = "SELECT o.*, m.name as motor_name, u.username as customer_name " +
+                "FROM orders o " +
+                "JOIN motors m ON o.motorid = m.motorid " +
+                "JOIN users u ON o.userid = u.userid " +
+                "ORDER BY o.order_date DESC";
 
         try (Connection conn = DatabaseUtil.getConnection();
              Statement stmt = conn.createStatement();
@@ -162,6 +181,7 @@ public class OrderDAO {
         order.setStatus(rs.getString("status"));
         order.setOrderDate(rs.getTimestamp("order_date"));
         order.setMotorName(rs.getString("motor_name"));
+        order.setCustomerName(rs.getString("customer_name")); // Add this line
         return order;
     }
 }

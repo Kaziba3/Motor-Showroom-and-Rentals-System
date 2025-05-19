@@ -40,9 +40,9 @@ public class LoginServlet extends HttpServlet {
 
             // Redirect based on role
             if ("Admin".equals(user.getRole())) {
-                response.sendRedirect(request.getContextPath() + "/Admin dashboard/admin.jsp");
+                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
             } else {
-                response.sendRedirect(request.getContextPath() + "/Customer dashboard/customer.jsp");
+                response.sendRedirect(request.getContextPath() + "/customer/dashboard");
             }
         } else {
             request.setAttribute("error", "Invalid username or password");

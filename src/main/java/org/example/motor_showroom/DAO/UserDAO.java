@@ -35,6 +35,37 @@ public class UserDAO {
         return users;
     }
 
+    public boolean updateUserRole(int userId, String newRole) {
+        String sql = "UPDATE users SET role = ? WHERE userid = ?";
+
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, newRole);
+            stmt.setInt(2, userId);
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteUser(int userId) {
+        String sql = "DELETE FROM users WHERE userid = ?";
+
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     private String hashPassword(String password) {
         try {
             String salt = "motor_showroom_salt";
@@ -48,16 +79,16 @@ public class UserDAO {
     }
 
     public boolean registerUser(User user) {
-        String sql = "INSERT INTO users (username, email, password, address, role) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (username, name, email, password, address, role) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, user.getUsername());
-            stmt.setString(2, user.getEmail());
-            stmt.setString(3, hashPassword(user.getPassword()));
-            stmt.setString(4, user.getAddress());
-            stmt.setString(5, user.getRole());
+            stmt.setString(3, user.getEmail());
+            stmt.setString(4, hashPassword(user.getPassword()));
+            stmt.setString(5, user.getAddress());
+            stmt.setString(6, user.getRole());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -118,5 +149,29 @@ public class UserDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public User getUserById(int userId) {
+        String sql = "SELECT * FROM users WHERE userid = ?";
+
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("userid"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setAddress(rs.getString("address"));
+                user.setRole(rs.getString("role"));
+                return user;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

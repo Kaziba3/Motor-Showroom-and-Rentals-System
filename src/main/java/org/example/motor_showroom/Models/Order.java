@@ -13,7 +13,8 @@ public class Order {
     private String paymentMethod;
     private String status;
     private Timestamp orderDate;
-    private String motorName; // New field
+    private String motorName;
+    private String customerName;
 
     // Getters and Setters
     public int getOrderId() { return orderId; }
@@ -37,5 +38,11 @@ public class Order {
     public Timestamp getOrderDate() { return orderDate; }
     public void setOrderDate(Timestamp orderDate) { this.orderDate = orderDate; }
     public String getMotorName() { return motorName; } // New getter
-    public void setMotorName(String motorName) { this.motorName = motorName; } // New setter
+    public void setMotorName(String motorName) { this.motorName = motorName; }
+    public String getCustomerName() {
+        return customerName;
+    }
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
 }

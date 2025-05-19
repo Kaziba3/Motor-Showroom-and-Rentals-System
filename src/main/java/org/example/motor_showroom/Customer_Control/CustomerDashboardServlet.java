@@ -32,6 +32,13 @@ public class CustomerDashboardServlet extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
         List<Motor> availableMotors = motorDao.getAvailableMotors();
+
+        // Debug output
+        System.out.println("Number of available motors: " + availableMotors.size());
+        for (Motor motor : availableMotors) {
+            System.out.println("Motor: " + motor.getName() + ", Image Path: " + motor.getImagePath());
+        }
+
         request.setAttribute("availableMotors", availableMotors);
         request.getRequestDispatcher("/Customer dashboard/customer.jsp").forward(request, response);
     }

@@ -37,8 +37,8 @@
       margin-bottom: 20px;
     }
     .vehicles-grid {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 20px;
     }
     .vehicle-card {
@@ -46,20 +46,24 @@
       border-radius: 8px;
       padding: 15px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      flex: 1 1 calc(33.333% - 20px);
       text-align: center;
     }
     .vehicle-image img {
       width: 100%;
+      height: 200px;
+      object-fit: contain;
       border-radius: 8px;
     }
     .btn {
       background-color: #007bff;
       color: white;
-      padding: 10px;
+      padding: 10px 15px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 10px;
     }
     .btn:hover {
       background-color: #0056b3;
@@ -67,6 +71,7 @@
     .empty-state {
       text-align: center;
       color: #dc3545;
+      grid-column: 1 / -1;
     }
   </style>
 </head>
@@ -81,6 +86,7 @@
 
 <div class="navbar">
   <a href="${pageContext.request.contextPath}/customer/dashboard">Home</a>
+  <a href="${pageContext.request.contextPath}/customer/orders">My Orders</a>
   <a href="${pageContext.request.contextPath}/Customer dashboard/about-us.jsp">About Us</a>
   <a href="${pageContext.request.contextPath}/Customer dashboard/contact-us.jsp">Contact Us</a>
   <a href="${pageContext.request.contextPath}/logout">Logout</a>
@@ -96,14 +102,15 @@
     %>
     <div class="vehicle-card">
       <div class="vehicle-image">
-        <img src="<%= motor.getImagePath() %>" alt="<%= motor.getName() %>">
+        <img src="${pageContext.request.contextPath}/<%= motor.getImagePath() %>"
+             alt="<%= motor.getName() %>"
+             onerror="this.src='${pageContext.request.contextPath}/resources/images/default-motor.jpg'">
       </div>
       <div class="vehicle-details">
-        <h3 class="vehicle-title"><%= motor.getName() %></h3>
-        <div class="vehicle-price">$<%= String.format("%.2f", motor.getPrice()) %></div>
-        <div class="vehicle-actions">
-          <a href="${pageContext.request.contextPath}/customer/order?motorId=<%= motor.getMotorId() %>" class="btn">Order Now</a>
-        </div>
+        <h3><%= motor.getName() %></h3>
+        <p>Type: <%= motor.getType() %></p>
+        <p>Price: $<%= String.format("%.2f", motor.getPrice()) %></p>
+        <a href="${pageContext.request.contextPath}/customer/order?motorId=<%= motor.getMotorId() %>" class="btn">Order Now</a>
       </div>
     </div>
     <% }} else { %>
