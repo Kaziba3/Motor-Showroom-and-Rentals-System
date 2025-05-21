@@ -7,6 +7,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.example.motor_showroom.Util.DatabaseUtil.getConnection;
+
 public class OrderDAO {
 
     // Create new order
@@ -15,7 +17,7 @@ public class OrderDAO {
                 + "total_amount, delivery_address, payment_method, status) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseUtil.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, order.getUserId());
@@ -41,7 +43,7 @@ public class OrderDAO {
                 "JOIN motors m ON o.motorid = m.motorid " +
                 "WHERE o.userid = ? ORDER BY o.order_date DESC";
 
-        try (Connection conn = DatabaseUtil.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, userId);
@@ -72,6 +74,7 @@ public class OrderDAO {
         return orders;
     }
 
+
     // Get all orders (admin view)
     public List<Order> getAllOrders() {
         List<Order> orders = new ArrayList<>();
@@ -81,7 +84,7 @@ public class OrderDAO {
                 "JOIN users u ON o.userid = u.userid " +
                 "ORDER BY o.order_date DESC";
 
-        try (Connection conn = DatabaseUtil.getConnection();
+        try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -101,7 +104,7 @@ public class OrderDAO {
                 + "JOIN motors m ON o.motorid = m.motorid "
                 + "ORDER BY o.order_date DESC LIMIT ?";
 
-        try (Connection conn = DatabaseUtil.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, limit);
@@ -120,7 +123,7 @@ public class OrderDAO {
     public boolean updateOrderStatus(int orderId, String status) {
         String sql = "UPDATE orders SET status = ? WHERE orderid = ?";
 
-        try (Connection conn = DatabaseUtil.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, status);
@@ -137,7 +140,7 @@ public class OrderDAO {
         String sql = "SELECT o.*, m.name as motor_name FROM orders o "
                 + "JOIN motors m ON o.motorid = m.motorid WHERE o.orderid = ?";
 
-        try (Connection conn = DatabaseUtil.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, orderId);
@@ -151,12 +154,26 @@ public class OrderDAO {
         }
         return null;
     }
-
+    public Integer getLatestOrderId(int userId) {
+        String sql = "SELECT order_id FROM orders WHERE user_id = ? ORDER BY order_date DESC LIMIT 1";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("orderid");
+            }
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     // Delete order
     public boolean deleteOrder(int orderId) {
         String sql = "DELETE FROM orders WHERE orderid = ?";
 
-        try (Connection conn = DatabaseUtil.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, orderId);

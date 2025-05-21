@@ -8,33 +8,35 @@
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
             height: 100vh;
+            overflow: hidden;
         }
 
         .image-side {
-            flex: 1;
-            background: url('https://images.unsplash.com/photo-1549921296-3a45f7cdd63b?auto=format&fit=crop&w=1050&q=80') no-repeat center center;
+            background: url("../uploads/loginpage.png") no-repeat center center;
             background-size: cover;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 2rem;
+            box-sizing: border-box;
         }
 
         .form-side {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(to bottom right, #1e3c72, #2a5298);
-            color: #fff;
+            width: 100%;
+            max-width: 460px;
+            backdrop-filter: blur(6px);
+            margin-right: 5%;
         }
 
         .auth-card {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(32, 32, 32, 0.85);
             padding: 2rem 3rem;
             border-radius: 12px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.4);
-            backdrop-filter: blur(8px);
-            width: 100%;
-            max-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+            color: #fff;
         }
 
         h1, h2 {
@@ -50,7 +52,7 @@
         .form-label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #ddd;
+            color: #ccc;
         }
 
         .form-control {
@@ -58,12 +60,13 @@
             padding: 0.6rem;
             border: none;
             border-radius: 8px;
-            background: #f3f3f3;
+            background: #2e2e2e;
+            color: #fff;
             font-size: 1rem;
         }
 
         .btn {
-            background-color: #ff6f00;
+            background-color: #b48a62;
             color: white;
             border: none;
             width: 100%;
@@ -76,11 +79,11 @@
         }
 
         .btn:hover {
-            background-color: #e65c00;
+            background-color: #a2744b;
         }
 
         .alert.error {
-            background: #ff4d4d;
+            background: #cc3333;
             color: white;
             padding: 0.6rem;
             margin-bottom: 1rem;
@@ -89,7 +92,7 @@
         }
 
         a {
-            color: #ffd700;
+            color: #f0c674;
             text-decoration: none;
         }
 
@@ -98,41 +101,45 @@
         }
 
         @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
             .image-side {
-                height: 40vh;
+                justify-content: center;
+                padding: 1rem;
+            }
+
+            .form-side {
+                max-width: 100%;
             }
         }
     </style>
+
 </head>
 <body>
-<div class="image-side"></div>
-<div class="form-side">
-    <div class="auth-card">
-        <h1>Motor Showroom</h1>
-        <h2>Login</h2>
+<div class="image-side">
+    <div class="form-side">
+        <div class="auth-card">
+            <h1>Motor Showroom</h1>
+            <h2>Login</h2>
 
-        <% if (request.getAttribute("error") != null) { %>
-        <div class="alert error"><%= request.getAttribute("error") %></div>
-        <% } %>
+            <% if (request.getAttribute("error") != null) { %>
+            <div class="alert error"><%= request.getAttribute("error") %></div>
+            <% } %>
 
-        <form action="${pageContext.request.contextPath}/login" method="POST">
-            <div class="form-group">
-                <label class="form-label" for="username">Username:</label>
-                <input type="text" class="form-control" id="username" name="username" required>
-            </div>
+            <form action="${pageContext.request.contextPath}/login" method="POST">
+                <div class="form-group">
+                    <label class="form-label" for="username">Username:</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
 
-            <div class="form-group">
-                <label class="form-label" for="password">Password:</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-            </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">Password:</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
 
-            <button type="submit" class="btn">Login</button>
-        </form>
+                <button type="submit" class="btn">Login</button>
+            </form>
 
-        <p>Don't have an account? <a href="${pageContext.request.contextPath}/auth/register.jsp">Register here</a></p>
+            <p>Don't have an account? <a href="${pageContext.request.contextPath}/auth/register.jsp">Register here</a></p>
+        </div>
     </div>
 </div>
 </body>

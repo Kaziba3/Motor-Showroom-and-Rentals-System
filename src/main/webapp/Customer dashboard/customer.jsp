@@ -86,7 +86,7 @@
 
 <div class="navbar">
   <a href="${pageContext.request.contextPath}/customer/dashboard">Home</a>
-  <a href="${pageContext.request.contextPath}/customer/orders">My Orders</a>
+  <a href="${pageContext.request.contextPath}/customer/order">My Orders</a>
   <a href="${pageContext.request.contextPath}/Customer dashboard/about-us.jsp">About Us</a>
   <a href="${pageContext.request.contextPath}/Customer dashboard/contact-us.jsp">Contact Us</a>
   <a href="${pageContext.request.contextPath}/logout">Logout</a>

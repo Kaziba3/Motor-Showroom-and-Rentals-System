@@ -79,16 +79,16 @@ public class UserDAO {
     }
 
     public boolean registerUser(User user) {
-        String sql = "INSERT INTO users (username, name, email, password, address, role) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (username, email, password, address, role) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, user.getUsername());
-            stmt.setString(3, user.getEmail());
-            stmt.setString(4, hashPassword(user.getPassword()));
-            stmt.setString(5, user.getAddress());
-            stmt.setString(6, user.getRole());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, hashPassword(user.getPassword()));
+            stmt.setString(4, user.getAddress());
+            stmt.setString(5, user.getRole());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {

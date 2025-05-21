@@ -8,33 +8,36 @@
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
             height: 100vh;
-        }
-
-        .form-side {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(to bottom right, #1e3c72, #2a5298);
-            color: #fff;
+            overflow: hidden;
         }
 
         .image-side {
-            flex: 1;
-            background: url('https://images.unsplash.com/photo-1616615281268-d9f51f83f2a4?auto=format&fit=crop&w=1050&q=80') no-repeat center center;
+            background: url("../uploads/registerpage.png") no-repeat center center;
             background-size: cover;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 2rem;
+            box-sizing: border-box;
         }
+
+        .form-side {
+            width: 100%;
+            max-width: 460px;
+            backdrop-filter: blur(6px);
+            margin-left: 5%;
+        }
+
 
         .auth-card {
             background: rgba(255, 255, 255, 0.08);
             padding: 2rem 3rem;
             border-radius: 12px;
             box-shadow: 0 0 20px rgba(0,0,0,0.4);
-            backdrop-filter: blur(8px);
-            width: 100%;
-            max-width: 450px;
+            color: #fff;
         }
 
         h1, h2 {
@@ -108,65 +111,68 @@
         }
 
         @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
             .image-side {
-                height: 40vh;
+                justify-content: center;
+                padding: 1rem;
+            }
+
+            .form-side {
+                max-width: 100%;
             }
         }
     </style>
 </head>
 <body>
-<div class="form-side">
-    <div class="auth-card">
-        <h1>Motor Showroom</h1>
-        <h2>Register</h2>
+<div class="image-side">
+    <div class="form-side">
+        <div class="auth-card">
+            <h1>Motor Showroom</h1>
+            <h2>Register</h2>
 
-        <% if (request.getAttribute("error") != null) { %>
-        <div class="alert error"><%= request.getAttribute("error") %></div>
-        <% } %>
+            <% if (request.getAttribute("error") != null) { %>
+            <div class="alert error"><%= request.getAttribute("error") %></div>
+            <% } %>
 
-        <form action="${pageContext.request.contextPath}/register" method="POST">
-            <div class="form-group">
-                <label class="form-label" for="username">Username:</label>
-                <input type="text" class="form-control" id="username" name="username" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="email">Email:</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="password">Password:</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="confirmPassword">Confirm Password:</label>
-                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="address">Address:</label>
-                <textarea class="form-control" id="address" name="address" rows="3"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Role:</label>
-                <div class="role-options">
-                    <label><input type="radio" name="role" value="Customer" checked> Customer</label>
-                    <label><input type="radio" name="role" value="Admin"> Admin</label>
+            <form action="${pageContext.request.contextPath}/register" method="POST">
+                <div class="form-group">
+                    <label class="form-label" for="username">Username:</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
                 </div>
-            </div>
 
-            <button type="submit" class="btn">Register</button>
-        </form>
+                <div class="form-group">
+                    <label class="form-label" for="email">Email:</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
 
-        <p>Already have an account? <a href="${pageContext.request.contextPath}/auth/login.jsp">Login here</a></p>
+                <div class="form-group">
+                    <label class="form-label" for="password">Password:</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirmPassword">Confirm Password:</label>
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="address">Address:</label>
+                    <textarea class="form-control" id="address" name="address" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Role:</label>
+                    <div class="role-options">
+                        <label><input type="radio" name="role" value="Customer" checked> Customer</label>
+                        <label><input type="radio" name="role" value="Admin"> Admin</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn">Register</button>
+            </form>
+
+            <p>Already have an account? <a href="${pageContext.request.contextPath}/auth/login.jsp">Login here</a></p>
+        </div>
     </div>
 </div>
-<div class="image-side"></div>
 </body>
 </html>

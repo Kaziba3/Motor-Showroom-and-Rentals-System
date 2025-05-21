@@ -17,7 +17,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 
-@WebServlet("/customer/orders")
+@WebServlet("/customer/order")
 public class OrderServlet extends HttpServlet {
     private MotorDAO motorDao;
     private OrderDAO orderDao;
@@ -37,25 +37,40 @@ public class OrderServlet extends HttpServlet {
             return;
         }
 
-        User user = (User) session.getAttribute("user");
-        System.out.println("Fetching orders for user ID: " + user.getUserId());
+        String motorIdParam = request.getParameter("motorId");
 
-        try {
-            List<Order> orders = orderDao.getOrdersByUserId(user.getUserId());
-            System.out.println("Found " + (orders != null ? orders.size() : 0) + " orders");
-
-            if (orders == null) {
-                request.setAttribute("error", "Failed to load orders. Please try again.");
-            } else {
-                request.setAttribute("orders", orders);
+        // If motorId parameter exists, show order form
+        if (motorIdParam != null) {
+            try {
+                int motorId = Integer.parseInt(motorIdParam);
+                Motor motor = motorDao.getMotorById(motorId);
+                if (motor == null || !motor.isAvailability()) {
+                    response.sendRedirect(request.getContextPath() + "/customer/dashboard?error=Motor+not+available");
+                    return;
+                }
+                request.setAttribute("motor", motor);
+                request.getRequestDispatcher("/Customer dashboard/order-motor.jsp").forward(request, response);
+            } catch (NumberFormatException e) {
+                response.sendRedirect(request.getContextPath() + "/customer/dashboard?error=Invalid+motor+ID");
             }
-
-            request.getRequestDispatcher("/Customer dashboard/my-orders.jsp").forward(request, response);
-        } catch (Exception e) {
-            System.err.println("Error loading orders for user " + user.getUserId());
-            e.printStackTrace();
-            request.setAttribute("error", "Error loading orders: " + e.getMessage());
-            request.getRequestDispatcher("/Customer dashboard/my-orders.jsp").forward(request, response);
+        }
+        // Otherwise show orders list
+        else {
+            User user = (User) session.getAttribute("user");
+            try {
+                List<Order> orders = orderDao.getOrdersByUserId(user.getUserId());
+                if (orders == null) {
+                    request.setAttribute("error", "Failed to load orders. Please try again.");
+                } else {
+                    request.setAttribute("orders", orders);
+                }
+                request.getRequestDispatcher("/Customer dashboard/my-orders.jsp").forward(request, response);
+            } catch (Exception e) {
+                System.err.println("Error loading orders for user " + user.getUserId());
+                e.printStackTrace();
+                request.setAttribute("error", "Error loading orders: " + e.getMessage());
+                request.getRequestDispatcher("/Customer dashboard/my-orders.jsp").forward(request, response);
+            }
         }
     }
 
@@ -116,7 +131,7 @@ public class OrderServlet extends HttpServlet {
 
             if (orderDao.createOrder(order)) {
                 System.out.println("Order created successfully, redirecting to confirmation page");
-                response.sendRedirect(request.getContextPath() + "/customer/order/confirmation?orderId=" + order.getOrderId());
+                response.sendRedirect(request.getContextPath() + "/customer/order/confirmation?orderId=" + orderDao.getLatestOrderId(user.getUserId()));
             } else {
                 response.sendRedirect(request.getContextPath() + "/customer/order?motorId=" + motorIdParam + "&error=Failed+to+place+order");
             }

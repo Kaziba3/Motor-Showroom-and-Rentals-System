@@ -8,12 +8,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         :root {
-            --sidebar-bg: #343a40;
-            --sidebar-text: #ffffff;
-            --primary-bg: #f1f3f5;
-            --card-bg: #ffffff;
-            --accent: #007bff;
-            --danger: #dc3545;
+            --sidebar-bg: rgba(30, 30, 30, 0.95);
+            --sidebar-text: #e0e0e0;
+            --primary-bg: rgba(0, 0, 0, 0.6);
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --accent: #c49b66;
+            --velvet-green: #2f3b2f;
+            --danger: #a63636;
         }
 
         * {
@@ -23,8 +24,18 @@
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--primary-bg);
-            color: #333;
+            display: flex;
+            background: url("../uploads/admindashboard.jpg") no-repeat center center fixed;
+            background-size: cover;
+            color: #f5f5f5;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: -1;
         }
 
         .sidebar {
@@ -37,11 +48,13 @@
             left: 0;
             top: 0;
             bottom: 0;
+            backdrop-filter: blur(8px);
         }
 
         .sidebar .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
+            font-size: 1.7rem;
+            font-weight: 600;
+            color: var(--accent);
             margin-bottom: 30px;
         }
 
@@ -50,20 +63,23 @@
             color: var(--sidebar-text);
             text-decoration: none;
             padding: 12px 16px;
-            border-radius: 4px;
-            margin-bottom: 8px;
-            transition: background 0.2s;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            transition: background 0.3s;
         }
 
         .sidebar nav a:hover,
         .sidebar nav a.active {
-            background-color: #495057;
+            background-color: var(--velvet-green);
         }
 
         .main {
             margin-left: 220px;
-            padding: 30px;
+            padding: 40px;
             width: calc(100% - 220px);
+            background-color: var(--primary-bg);
+            backdrop-filter: blur(6px);
+            min-height: 100vh;
         }
 
         .header {
@@ -75,7 +91,8 @@
 
         .header h1 {
             margin: 0;
-            font-size: 1.8rem;
+            font-size: 2rem;
+            color: #fdfdfd;
         }
 
         .logout-btn {
@@ -85,26 +102,30 @@
             padding: 10px 18px;
             border-radius: 5px;
             cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
         }
 
         .logout-btn:hover {
-            opacity: 0.9;
+            background-color: #8a2e2e;
         }
 
         .alert {
             padding: 15px;
             margin-bottom: 20px;
-            border-radius: 4px;
+            border-radius: 6px;
         }
 
         .alert-success {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: rgba(40, 167, 69, 0.2);
+            color: #d4edda;
+            border: 1px solid rgba(40, 167, 69, 0.3);
         }
 
         .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #f8d7da;
+            border: 1px solid rgba(220, 53, 69, 0.3);
         }
 
         table {
@@ -113,40 +134,33 @@
             background: var(--card-bg);
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         th, td {
             padding: 14px 16px;
             text-align: left;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f2f2f2;
         }
 
         th {
-            background-color: #f8f9fa;
-            font-weight: 600;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fdfdfd;
         }
 
         tr:hover {
-            background-color: #f1f1f1;
+            background-color: rgba(255, 255, 255, 0.05);
         }
 
         .btn {
-            padding: 8px 12px;
+            padding: 8px 14px;
             border-radius: 4px;
             cursor: pointer;
             border: none;
             font-size: 0.9rem;
-            transition: opacity 0.2s;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
-        }
-
-        .btn-primary {
-            background-color: var(--accent);
-            color: white;
+            transition: background 0.3s;
         }
 
         .btn-danger {
@@ -154,10 +168,16 @@
             color: white;
         }
 
+        .btn-danger:hover {
+            background-color: #8a2e2e;
+        }
+
         select {
             padding: 8px;
             border-radius: 4px;
-            border: 1px solid #ced4da;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
         }
 
         @media (max-width: 768px) {
@@ -257,7 +277,7 @@
         } else {
         %>
         <tr>
-            <td colspan="5" style="text-align: center;">No users found</td>
+            <td colspan="5" style="text-align: center; color: #777;">No users found</td>
         </tr>
         <% } %>
         </tbody>
