@@ -155,7 +155,7 @@ public class OrderDAO {
         return null;
     }
     public Integer getLatestOrderId(int userId) {
-        String sql = "SELECT order_id FROM orders WHERE user_id = ? ORDER BY order_date DESC LIMIT 1";
+        String sql = "SELECT orderid FROM orders WHERE userid = ? ORDER BY order_date DESC LIMIT 1";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);

@@ -8,7 +8,7 @@ import java.util.Properties;
 public class DatabaseUtil {
     private static final String URL = "jdbc:mysql://localhost:3306/motor_showroom?useSSL=false&serverTimezone=UTC";
     private static final String USER = "root";
-    private static final String PASSWORD = ""; // Change if you have a password
+    private static final String PASSWORD = "";
 
     static {
         try {

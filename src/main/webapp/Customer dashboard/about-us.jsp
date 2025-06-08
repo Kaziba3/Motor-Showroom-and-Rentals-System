@@ -11,6 +11,20 @@
             margin: 0;
             padding: 20px;
         }
+        .navbar {
+            background-color: #343a40;
+            padding: 10px;
+            color: white;
+        }
+        .navbar a {
+            color: white;
+            margin-right: 15px;
+            text-decoration: none;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+       
         .container {
             max-width: 800px;
             margin: auto;
@@ -37,6 +51,13 @@
     </style>
 </head>
 <body>
+<div class="navbar">
+    <a href="${pageContext.request.contextPath}/customer/dashboard">Home</a>
+    <a href="${pageContext.request.contextPath}/customer/order">My Orders</a>
+    <a href="${pageContext.request.contextPath}/Customer dashboard/about-us.jsp">About Us</a>
+    <a href="${pageContext.request.contextPath}/Customer dashboard/contact-us.jsp">Contact Us</a>
+    <a href="${pageContext.request.contextPath}/logout">Logout</a>
+</div>
 <div class="container">
     <h1 class="section-title">About Our Motor Showroom</h1>
     <div class="about-content">
